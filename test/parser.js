@@ -1,7 +1,11 @@
-const startTagOpen = /^<([\w\-]+)/,	// 开始标签头
-	startTagClose = /^\s*(\/?)>/, // 开始标签尾
-	attribute = /^\s*([^\s"'<>\/=]+)(?:\s*((?:=))\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/, // 标签属性
-	endTag = /^<\/([\w\-]+)>/; // 结束标签
+// 开始标签头
+const startTagOpen = /^<([\w\-]+)/,
+// 开始标签尾
+startTagClose = /^\s*(\/?)>/, 
+// 标签属性
+attribute = /^\s*([^\s"'<>\/=]+)(?:\s*((?:=))\s*(?:"([^"]*)"+|'([^']*)'+|([^\s"'=<>`]+)))?/,
+// 结束标签
+endTag = /^<\/([\w\-]+)>/; 
 
 function parse (html) {
 	let root // AST根节点
@@ -61,6 +65,7 @@ function HTMLParser (html, handler) {
 		if (textEnd === 0) {
 			// 匹配开始标签
 			var startTagMatch = parseStartTag();
+			console.log(startTagMatch)
 			if (startTagMatch) {
 				handleStartTag(startTagMatch);
 				continue;
@@ -126,6 +131,7 @@ function HTMLParser (html, handler) {
 			if (end) {
 				advance(end[0].length);
 				match.end = index;
+				console.log(match);
 				return match;
 			}
 		}
@@ -178,7 +184,8 @@ function HTMLParser (html, handler) {
 
 // 自闭合标签
 // empty(tag) => boolean
-var empty = makeMap('area,base,basefont,br,col,embed,frame,hr,img,input,isindex,keygen,link,meta,param,source,track,wbr');
+var empty = makeMap('area,base,basefont,br,col,embed,frame,hr,img,' + 
+							'input,isindex,keygen,link,meta,param,source,track,wbr');
 
 function makeMap (values) {
 	values = values.split(/,/);
@@ -192,11 +199,5 @@ function makeMap (values) {
 }
 
 console.log(parse(
-	`<div class="container">
-	<span :class="{active: isActive}">{{this.msg}}</span>
-	<ul>
-		<li v-for="item in list">{{item + $index}}</li>
-	</ul>
-	<button @click="handle">change msg</button>
-</div>`
+	`<div>{{18<age?'adult':'nonage'}}</div>`
 ));

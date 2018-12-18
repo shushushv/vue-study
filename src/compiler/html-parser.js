@@ -1,3 +1,5 @@
+import config from '../config'
+
 /**
  * html字符串 转成 AST对象
  *
@@ -45,11 +47,16 @@ export function parse (html) {
     chars (text) {
       text = currentParent.tag === 'pre'
         ? text
-        : text.trim() ? text : ' '
-      currentParent.children.push(text)
+        : text.trim()
+        ? text
+        : config.preserveWhiteSpace
+          ? ' '
+          : null
+      if (text) {
+        currentParent.children.push(text)
+      }
     }
   })
-  console.log(root)
   return root
 }
 
