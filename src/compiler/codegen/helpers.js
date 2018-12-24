@@ -18,3 +18,47 @@ export function getAndRemoveAttr (el, attr) {
   }
   return val
 }
+
+const modifierRE = /\.[^\.]+/g
+
+// 获取事件修饰符
+export function parseModifiers (name) {
+  const match = name.match(modifierRE)
+  if (match) {
+    return match.map(m => m.slice(1))
+  }
+}
+
+// 删除事件修饰符
+export function removeModifiers (name) {
+  return name.replace(modifierRE, '')
+}
+
+// 文本解析
+// eg： "hi,{{name}}!" => "hi,"+(msg)+"!"
+const tagRE = /\{\{((?:.|\\n)+?)\}\}/g
+export function parseText (text) {
+  if (!tagRE.test(text)) {
+    return null
+  }
+  var tokens = []
+  var lastIndex = tagRE.lastIndex = 0
+  var match, index, value
+  /* eslint-disable no-cond-assign */
+  while (match = tagRE.exec(text)) { // 循环解析 {{}}
+  /* eslint-enable no-cond-assign */
+    index = match.index
+    // 把 '{{' 之前的文本推入
+    if (index > lastIndex) {
+      tokens.push(JSON.stringify(text.slice(lastIndex, index)))
+    }
+    // 把{{}}中间数据取出推入
+    value = match[1]
+    tokens.push('(' + match[1].trim() + ')')
+    lastIndex = index + match[0].length
+  }
+  if (lastIndex < text.length) {
+    tokens.push(JSON.stringify(text.slice(lastIndex)))
+  }
+  return tokens.join('+')
+}

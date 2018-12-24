@@ -6,7 +6,7 @@ import { nextTick, isReserved } from '../util/index'
 export default function Component (options) {
   this.$options = options
   this._data = options.data
-  const el = this._el = document.querySelector(options.el)
+  this._el = document.querySelector(options.el)
 
   this._el.innerHTML = ''
 
@@ -35,7 +35,7 @@ Component.prototype._update = function (vtree) {
   this._tree = vtree
 }
 
-// dara代理
+// data代理
 function proxy (vm, key) {
   if (!isReserved(key)) {
     Object.defineProperty(vm, key, {
