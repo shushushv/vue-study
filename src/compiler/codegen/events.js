@@ -27,9 +27,8 @@ const modifierCode = {
  */
 export function addHandler (events, name, value, modifiers) {
 	// check capture modifier
-	const captureIndex = modifiers && modifiers.indexOf('capture')
-	if (captureIndex > -1) {
-		modifiers.splice(captureIndex, 1)
+	if (modifiers && modifiers.capture) {
+    delete modifiers.capture
 		name = '!' + name
 	}
 	const newHandler = { value, modifiers }
@@ -66,18 +65,17 @@ function genHandler (handler) {
     return 'function(){}'
   } else if (isArray(handler)) {
     return `[${handler.map(genHandler).join(',')}]`
-  } else if (!handler.modifiers || !handler.modifiers.length) {
+  } else if (!handler.modifiers) {
     return simplePathRE.test(handler.value)
       ? handler.value
       : `function($event){${handler.value}}`
   } else {
     let code = 'function($event){'
-    for (let i = 0; i < handler.modifiers.length; i++) {
-      let modifier = handler.modifiers[i]
-      code += modifierCode[modifier] || genKeyFilter(modifier)
+    for (let key in handler.modifiers) {
+      code += modifierCode[key] || genKeyFilter(key)
     }
     let handlerCode = simplePathRE.test(handler.value)
-      ? handler.value + '()'
+      ? handler.value + '($event)'
       : handler.value
     return code + handlerCode + '}'
   }

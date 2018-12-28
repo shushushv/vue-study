@@ -25,7 +25,9 @@ const modifierRE = /\.[^\.]+/g
 export function parseModifiers (name) {
   const match = name.match(modifierRE)
   if (match) {
-    return match.map(m => m.slice(1))
+    const ret = {}
+    match.forEach(m => { ret[m.slice(1)] = true })
+    return ret
   }
 }
 
