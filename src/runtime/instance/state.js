@@ -17,6 +17,7 @@ import {
  *  - 自定义方法
  */
 export function initState (vm) {
+  vm._watchers = []
   initData(vm)
   initComputed(vm)
   initMethods(vm)
