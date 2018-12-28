@@ -2,7 +2,7 @@ import VNode from './vnode'
 import { isPrimitive, isArray } from '../util/index'
 
 // 添加namespace
-function addNS(data, children) {
+function addNS (data, children) {
   data.ns = 'http://www.w3.org/2000/svg'
   if (children !== undefined) {
     for (var i = 0; i < children.length; ++i) {

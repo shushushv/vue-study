@@ -7,7 +7,7 @@
 export function getAndRemoveAttr (el, attr) {
 	let val
 	// 如果属性存在，则从AST对象的attrs和attrsMap移除
-  if (val = el.attrsMap[attr]) {
+  if ((val = el.attrsMap[attr])) {
     el.attrsMap[attr] = null
     for (let i = 0, l = el.attrs.length; i < l; i++) {
       if (el.attrs[i].name === attr) {
@@ -43,17 +43,14 @@ export function parseText (text) {
   }
   var tokens = []
   var lastIndex = tagRE.lastIndex = 0
-  var match, index, value
-  /* eslint-disable no-cond-assign */
-  while (match = tagRE.exec(text)) { // 循环解析 {{}}
-  /* eslint-enable no-cond-assign */
+  var match, index
+  while ((match = tagRE.exec(text))) { // 循环解析 {{}}
     index = match.index
     // 把 '{{' 之前的文本推入
     if (index > lastIndex) {
       tokens.push(JSON.stringify(text.slice(lastIndex, index)))
     }
     // 把{{}}中间数据取出推入
-    value = match[1]
     tokens.push('(' + match[1].trim() + ')')
     lastIndex = index + match[0].length
   }

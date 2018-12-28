@@ -1,15 +1,13 @@
+import config from './config'
 import { compile } from './compiler/index'
 import { getOuterHTML, query } from './util/index'
 import Component from './instance/index'
 
 export default function Vue (options) {
   if (!options.render) {
+    const template = options.template || getOuterHTML(query(options.el))
 		// 模版字符串 => AST语法树 => render函数
-    if (options.template) {
-      options.render = compile(options.template)
-    } else if (options.el) {
-      options.render = compile(getOuterHTML(query(options.el)))
-    }
+    options.render = compile(template, config.preserveWhiteSpace)
   }
   return new Component(options)
 }

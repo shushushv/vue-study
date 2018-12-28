@@ -1,4 +1,3 @@
-import config from '../../config'
 import { genEvents, addHandler } from './events'
 import { genModel } from './model'
 import {
@@ -22,20 +21,20 @@ const mustUsePropsRE = /^(value|selected|checked|muted)$/
 export function generate (ast) {
   // 从根节点（容器节点）开始解析
   const code = genElement(ast)
-  return new Function (`with (this) { return ${code}}`)
+  return new Function(`with (this) { return ${code}}`)
 }
 
 // 元素节点解析
 function genElement (el, key) {
   let exp
-  if (exp = getAndRemoveAttr(el, 'v-for')) { // 解析v-for指令
+  if ((exp = getAndRemoveAttr(el, 'v-for'))) { // 解析v-for指令
     return genFor(el, exp)
-  } else if (exp = getAndRemoveAttr(el, 'v-if')) { // 解析v-if指令
+  } else if ((exp = getAndRemoveAttr(el, 'v-if'))) { // 解析v-if指令
     return genIf(el, exp, key)
   } else if (el.tag === 'template') { // 解析子组件
     return genChildren(el)
   } else {
-    return `__h__('${el.tag}', ${genData(el, key) }, ${genChildren(el)})`
+    return `__h__('${el.tag}', ${genData(el, key)}, ${genChildren(el)})`
   }
 }
 
@@ -48,14 +47,14 @@ function genIf (el, exp, key) {
 function genFor (el, exp) {
   const inMatch = exp.match(/([a-zA-Z_][\w]*)\s+(?:in|of)\s+(.*)/)
   if (!inMatch) {
-    throw new Error('Invalid v-for expression: '+ exp)
+    throw new Error('Invalid v-for expression: ' + exp)
   }
   const alias = inMatch[1].trim()
   exp = inMatch[2].trim()
   let key = getAndRemoveAttr(el, 'track-by') // 后面用 :key 代替了 track-by
 
   if (!key) {
-    key ='undefined'
+    key = 'undefined'
   } else if (key !== '$index') {
     key = alias + '["' + key + '"]'
   }
@@ -69,8 +68,8 @@ function genData (el, key) {
     return '{}'
   }
   let data = '{'
-  let attrs = `attrs:{`
-  let props = `props:{`
+  let attrs = 'attrs:{'
+  let props = 'props:{'
   let events = {}
   let hasAttrs = false
   let hasProps = false
