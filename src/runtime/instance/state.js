@@ -42,7 +42,7 @@ function initData (vm) {
   var keys = Object.keys(data)
   var i = keys.length
   while (i--) {
-    vm._proxy(keys[i])
+    proxy(vm, keys[i])
   }
   // 添加观察者，数据劫持
   observe(data, vm)
@@ -134,9 +134,25 @@ function unproxy (vm, key) {
 }
 
 /**
+ * 建立`$data`属性访问器，因为设置`$data`需要观察新对象和更新代理属性。
+ */
+export function stateMixin (Vue) {
+  Object.defineProperty(Vue.prototype, '$data', {
+    get () {
+      return this._data
+    },
+    set (newData) {
+      if (newData !== this._data) {
+        setData(this, newData)
+      }
+    }
+  })
+}
+
+/**
  * 在`$data`被设置（setter）时调用，替换实例的`$data`属性
  */
-export function setData (vm, newData) {
+function setData (vm, newData) {
   newData = newData || {}
   var oldData = vm._data
   vm._data = newData
