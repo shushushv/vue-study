@@ -98,45 +98,19 @@ function makeComputedGetter (getter, owner) {
  * 初始化methods。方法必须绑定到实例，因为它们可能作为支柱传递给子组件。
  */
 function initMethods (vm) {
-  var methods = vm.$options.methods
+  const methods = vm.$options.methods
   if (methods) {
-    for (var key in methods) {
+    for (let key in methods) {
       vm[key] = bind(methods[key], vm)
     }
   }
 }
 
 /**
- * 数据代理：vm.prop === vm._data.prop
- */
-function proxy (vm, key) {
-  if (!isReserved(key)) {
-    Object.defineProperty(vm, key, {
-      configurable: true,
-      enumerable: true,
-      get: function proxyGetter () {
-        return vm._data[key]
-      },
-      set: function proxySetter (val) {
-        vm._data[key] = val
-      }
-    })
-  }
-}
-
-/**
- * 取消数据代理
- */
-function unproxy (vm, key) {
-  if (!isReserved(key)) {
-    delete vm[key]
-  }
-}
-
-/**
- * 建立`$data`属性访问器，因为设置`$data`需要观察新对象和更新代理属性。
+ * 状态混入
  */
 export function stateMixin (Vue) {
+  // 建立`$data`属性访问器，因为设置`$data`需要观察新对象和更新代理属性。
   Object.defineProperty(Vue.prototype, '$data', {
     get () {
       return this._data
@@ -147,6 +121,18 @@ export function stateMixin (Vue) {
       }
     }
   })
+  
+  Vue.prototype.$watch = function (fn, cb, options) {
+    options = options || {}
+    options.user = true
+    const watcher = new Watcher(this, fn, cb, options)
+    if (options.immediate) {
+      cb.call(this, watcher.value)
+    }
+    return function unwatchFn () {
+      watcher.teardown()
+    }
+  }
 }
 
 /**
@@ -178,4 +164,31 @@ function setData (vm, newData) {
   oldData.__ob__.removeVm(vm)
   observe(newData, vm)
   vm.$forceUpdate()
+}
+
+/**
+ * 数据代理：vm.prop === vm._data.prop
+ */
+function proxy (vm, key) {
+  if (!isReserved(key)) {
+    Object.defineProperty(vm, key, {
+      configurable: true,
+      enumerable: true,
+      get: function proxyGetter () {
+        return vm._data[key]
+      },
+      set: function proxySetter (val) {
+        vm._data[key] = val
+      }
+    })
+  }
+}
+
+/**
+ * 取消数据代理
+ */
+function unproxy (vm, key) {
+  if (!isReserved(key)) {
+    delete vm[key]
+  }
 }
