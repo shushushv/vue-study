@@ -35,6 +35,8 @@ function genElement (el, key) {
     return genIf(el, exp, key)
   } else if (el.tag === 'template') { // 解析子组件
     return genChildren(el)
+  } else if (el.tag === 'render') {
+    return genRender(el)
   } else {
     return `__h__('${el.tag}', ${genData(el, key)}, ${genChildren(el)})`
   }
@@ -179,4 +181,14 @@ function genText (text) {
       return JSON.stringify(text)
     }
   }
+}
+
+function genRender (el) {
+  const method = el.attrsMap.method
+  const args = el.attrsMap.args
+  if (process.env.NODE_ENV !== 'production' && !method) {
+    console.error('method attribute is required on <render>.')
+    return 'undefined'
+  }
+  return `${method}(${args})`
 }
