@@ -4,3 +4,5 @@ npm-debug.log
 explorations
 TODOs.md
 dist
+dist/*.gz
+dist/vue.common.min.js
