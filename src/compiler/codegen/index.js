@@ -1,5 +1,6 @@
-import { genEvents, addHandler } from './events'
+import { genHandlers, addHandler } from './on'
 import { genModel } from './model'
+import { genClass } from './class'
 import {
   parseText,
   parseModifiers,
@@ -20,7 +21,7 @@ const mustUsePropsRE = /^(value|selected|checked|muted)$/
  */
 export function generate (ast) {
   // 从根节点（容器节点）开始解析
-  const code = genElement(ast)
+  const code = ast ? genElement(ast) : '__h__("div")'
   return new Function(`with (this) { return ${code}}`)
 }
 
@@ -81,15 +82,12 @@ function genData (el, key) {
   }
 
   // class
-  const classBinding = getAndRemoveAttr(el, ':class') || getAndRemoveAttr(el, 'v-bind:class')
-  if (classBinding) {
-    data += `class: ${classBinding},`
-  }
-  const staticClass = getAndRemoveAttr(el, 'class')
-  if (staticClass) {
-    data += `staticClass: "${staticClass}",`
-  }
+  // do it before other attributes becaues it removes static class
+  // and class bindings from the element
+  data += genClass(el)
   
+  // parent elements my need to add props to children
+  // e.g. select
   if (el.props) {
     hasProps = true
     props += el.props + ','
@@ -140,7 +138,7 @@ function genData (el, key) {
     data += props.slice(0, -1) + '},'
   }
   if (hasEvents) {
-    data += genEvents(events) // 事件解析
+    data += genHandlers(events) // 事件解析
   }
   return data.replace(/,$/, '') + '}'
 }

@@ -1,5 +1,5 @@
-// 处理v-model，把数据绑定到value值上，并监听oninput事件
-import { addHandler } from './events'
+// 处理v-model，把数据绑定到value值上，并监听事件
+import { addHandler } from './on'
 
 export function genModel (el, events, value, modifiers) {
   if (el.tag === 'select') {

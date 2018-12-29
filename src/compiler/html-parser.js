@@ -23,6 +23,10 @@ export function parse (html, preserveWhiteSpace) {
       // 初始化根节点
       if (!root) {
         root = element
+      } else if (process.env.NODE_ENV !== 'production' && !stack.length) {
+        console.error(
+          'Component template should contain exactly one root element:\n\n' + html
+        )
       }
       // 有父节点，就把当前节点推入children数组
       if (currentParent) {
@@ -43,6 +47,14 @@ export function parse (html, preserveWhiteSpace) {
     },
     // 处理文本节点
     chars (text) {
+      if (!currentParent) {
+        if (process.env.NODE_ENV !== 'production' && !root) {
+          console.error(
+            'Component template should contain exactly one root element:\n\n' + html
+          )
+        }
+        return
+      }
       text = currentParent.tag === 'pre'
         ? text
         : text.trim()
