@@ -4,6 +4,7 @@ import { isPrimitive } from '../util/index'
 
 const emptyNode = VNode('', {}, [], undefined, undefined)
 const hooks = ['create', 'update', 'remove', 'destroy', 'pre', 'post']
+const svgNS = 'http://www.w3.org/2000/svg'
 
 function isUndef (s) {
   return s === undefined
@@ -74,8 +75,8 @@ export default function createPatchFunction (modules, api) {
     const tag = vnode.sel
     if (isDef(tag)) {
       // 创建节点
-      elm = vnode.elm = isDef(data) && isDef(i = data.ns)
-        ? api.createElementNS(i, tag)
+      elm = vnode.elm = isDef(data) && data.svg
+        ? api.createElementNS(svgNS, tag)
         : api.createElement(tag)
       // 循环创建子节点
       if (Array.isArray(children)) {
@@ -306,6 +307,6 @@ export default function createPatchFunction (modules, api) {
 
     // 执行posy钩子函数
     for (i = 0; i < cbs.post.length; ++i) cbs.post[i]()
-    return vnode
+    return vnode.elm
   }
 }
