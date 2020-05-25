@@ -45,6 +45,7 @@ export function parse (html, preserveWhiteSpace) {
       let element = {
         tag,
         attrs,
+				plain: !attrs.length,
         attrsMap: makeAttrsMap(attrs),
         parent: currentParent,
         children: []

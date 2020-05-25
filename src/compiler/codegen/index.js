@@ -59,7 +59,7 @@ function genFor (el) {
 
 // 属性解析
 function genData (el, key) {
-  if (!el.attrs.length && !key) {
+  if (el.plain) {
     return '{}'
   }
   let data = '{'
@@ -84,7 +84,13 @@ function genData (el, key) {
   // class
   // do it before other attributes becaues it removes static class
   // and class bindings from the element
-  data += genClass(el)
+  // data += genClass(el)
+	if (el.staticClass) {
+		data += `staticClass:"${el.staticClass}",`;
+	}
+	if (el.classBinding) {
+		data += `class:${el.classBinding},`;
+	}
   
   // parent elements my need to add props to children
   // e.g. select
