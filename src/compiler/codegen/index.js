@@ -28,11 +28,10 @@ export function generate (ast) {
 
 // 元素节点解析
 function genElement (el, key) {
-  let exp
-  if ((exp = getAndRemoveAttr(el, 'v-for'))) { // 解析v-for指令
-    return genFor(el, exp)
-  } else if ((exp = getAndRemoveAttr(el, 'v-if'))) { // 解析v-if指令
-    return genIf(el, exp, key)
+  if (el['for']) { // 解析v-for指令
+    return genFor(el)
+  } else if (el['if']) { // 解析v-if指令
+    return genIf(el, key)
   } else if (el.tag === 'template') { // 解析子组件
     return genChildren(el)
   } else if (el.tag === 'render') {
@@ -43,27 +42,19 @@ function genElement (el, key) {
 }
 
 // 解析v-if指令
-function genIf (el, exp, key) {
+function genIf (el, key) {
+	const exp = el['if'];
+	el['if'] = false;
   return `(${exp}) ? ${genElement(el, key)} : null`
 }
 
 // 解析v-for指令
-function genFor (el, exp) {
-  const inMatch = exp.match(/([a-zA-Z_][\w]*)\s+(?:in|of)\s+(.*)/)
-  if (!inMatch) {
-    throw new Error('Invalid v-for expression: ' + exp)
-  }
-  const alias = inMatch[1].trim()
-  exp = inMatch[2].trim()
-  let key = getAndRemoveAttr(el, 'track-by') // 后面用 :key 代替了 track-by
-
-  if (!key) {
-    key = 'undefined'
-  } else if (key !== '$index') {
-    key = alias + '["' + key + '"]'
-  }
-
-  return `(${exp}) && (${exp}).map(function (${alias}, $index) {return ${genElement(el, key)}})`
+function genFor (el) {
+	const exp = el['for'];
+  const alias = el.alias;
+  console.log(exp, alias);
+	el['for'] = false; // avoid recursion
+  return `(${exp}) && (${exp}).map(function (${alias}, $index) {return ${genElement(el)}})`
 }
 
 // 属性解析

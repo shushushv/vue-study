@@ -120,10 +120,14 @@ export function parse (html, preserveWhiteSpace) {
 function processControlFlow (el) {
   let exp
   if ((exp = getAndRemoveAttr(el, 'v-for'))) {
-    el['for'] = exp
-    if ((exp = getAndRemoveAttr(el, 'track-by'))) {
-      el.key = exp
-    }
+		const inMatch = exp.match(/([a-zA-Z_][\w]*)\s+(?:in|of)\s+(.*)/);
+		el.alias = inMatch[1].trim();
+		el['for'] = inMatch[2].trim();
+		if ((exp = getAndRemoveAttr(el, 'track-by'))) {
+			el.key = exp === '$index'
+				? exp
+				: el.alias + '["' + exp + '"]';
+		}
   }
   if ((exp = getAndRemoveAttr(el, 'v-if'))) {
     el['if'] = exp
